@@ -6,7 +6,7 @@ spring:
     name: account-service
   data:
     mongodb:
-      uri: ${SPRING_DATA_MONGODB_URI:mongodb://localhost:27017/account_db}
+      uri: ${SPRING_DATA_MONGODB_URI:mongodb://mongodb+srv://kim:alinemongo%401@cluster0.0jrqyub.mongodb.net/account_db}
 
 springdoc:
   api-docs:

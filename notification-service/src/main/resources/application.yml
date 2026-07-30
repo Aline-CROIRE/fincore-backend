@@ -6,7 +6,7 @@ spring:
     name: notification-service
   data:
     mongodb:
-      uri: ${SPRING_DATA_MONGODB_URI:mongodb://localhost:27017/notification_db}
+      uri: ${SPRING_DATA_MONGODB_URI:mongodb://mongodb+srv://kim:alinemongo%401@cluster0.0jrqyub.mongodb.net/notification_db}
   rabbitmq:
     host: ${SPRING_RABBITMQ_HOST:localhost}
     port: ${SPRING_RABBITMQ_PORT:5672}
