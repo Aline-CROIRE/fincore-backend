@@ -1,6 +1,4 @@
----
 
-#### 4. `documentation/api-documentation.md`
 Path: `fincore-backend/documentation/api-documentation.md`
 
 ```markdown
@@ -30,4 +28,4 @@ Path: `fincore-backend/documentation/api-documentation.md`
 - `GET /api/transactions/account/{accountNumber}`
 
 ## Notification Service APIs
-- `GET /api/notifications/user/{userId}`
+- `GET /api/notifications/user/{userId}
