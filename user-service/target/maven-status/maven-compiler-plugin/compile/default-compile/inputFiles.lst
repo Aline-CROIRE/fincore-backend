@@ -1,0 +1,11 @@
+C:\Users\Ephron\Desktop\Mine\Growth\fincore-backend\user-service\src\main\java\com\fincore\user\dto\CreateProfileRequest.java
+C:\Users\Ephron\Desktop\Mine\Growth\fincore-backend\user-service\src\main\java\com\fincore\user\config\OpenApiConfig.java
+C:\Users\Ephron\Desktop\Mine\Growth\fincore-backend\user-service\src\main\java\com\fincore\user\controller\UserController.java
+C:\Users\Ephron\Desktop\Mine\Growth\fincore-backend\user-service\src\main\java\com\fincore\user\model\UserProfile.java
+C:\Users\Ephron\Desktop\Mine\Growth\fincore-backend\user-service\src\main\java\com\fincore\user\repository\UserProfileRepository.java
+C:\Users\Ephron\Desktop\Mine\Growth\fincore-backend\user-service\src\main\java\com\fincore\user\service\UserService.java
+C:\Users\Ephron\Desktop\Mine\Growth\fincore-backend\user-service\src\main\java\com\fincore\user\UserServiceApplication.java
+C:\Users\Ephron\Desktop\Mine\Growth\fincore-backend\user-service\src\main\java\com\fincore\user\dto\UpdateProfileRequest.java
+C:\Users\Ephron\Desktop\Mine\Growth\fincore-backend\user-service\src\main\java\com\fincore\user\dto\UserProfileResponse.java
+C:\Users\Ephron\Desktop\Mine\Growth\fincore-backend\user-service\src\main\java\com\fincore\user\service\impl\UserServiceImpl.java
+C:\Users\Ephron\Desktop\Mine\Growth\fincore-backend\user-service\src\main\java\com\fincore\user\model\Address.java

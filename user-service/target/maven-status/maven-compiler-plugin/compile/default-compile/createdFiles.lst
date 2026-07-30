@@ -1,0 +1,16 @@
+com\fincore\user\model\Address.class
+com\fincore\user\model\Address$AddressBuilder.class
+com\fincore\user\repository\UserProfileRepository.class
+com\fincore\user\UserServiceApplication.class
+com\fincore\user\dto\UpdateProfileRequest.class
+com\fincore\user\model\UserProfile.class
+com\fincore\user\config\OpenApiConfig.class
+com\fincore\user\dto\UserProfileResponse$UserProfileResponseBuilder.class
+com\fincore\user\service\impl\UserServiceImpl.class
+com\fincore\user\model\UserProfile$UserProfileBuilder.class
+com\fincore\user\dto\CreateProfileRequest$CreateProfileRequestBuilder.class
+com\fincore\user\controller\UserController.class
+com\fincore\user\dto\UpdateProfileRequest$UpdateProfileRequestBuilder.class
+com\fincore\user\service\UserService.class
+com\fincore\user\dto\CreateProfileRequest.class
+com\fincore\user\dto\UserProfileResponse.class
