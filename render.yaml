@@ -93,4 +93,81 @@ services:
       - key: JWT_SECRET
         sync: false
       - key: PORT
-        value: 8080
+        value: 8080services:
+  - type: web
+    name: fincore-auth-service
+    env: docker
+    dockerfilePath: auth-service/Dockerfile
+    envVars:
+      - key: SPRING_DATA_MONGODB_URI
+        sync: false
+      - key: JWT_SECRET
+        sync: false
+      - key: PORT
+        value: "8081"
+
+  - type: web
+    name: fincore-user-service
+    env: docker
+    dockerfilePath: user-service/Dockerfile
+    envVars:
+      - key: SPRING_DATA_MONGODB_URI
+        sync: false
+      - key: PORT
+        value: "8082"
+
+  - type: web
+    name: fincore-account-service
+    env: docker
+    dockerfilePath: account-service/Dockerfile
+    envVars:
+      - key: SPRING_DATA_MONGODB_URI
+        sync: false
+      - key: PORT
+        value: "8083"
+
+  - type: web
+    name: fincore-transaction-service
+    env: docker
+    dockerfilePath: transaction-service/Dockerfile
+    envVars:
+      - key: SPRING_DATA_MONGODB_URI
+        sync: false
+      - key: SPRING_RABBITMQ_ADDRESSES
+        sync: false
+      - key: ACCOUNT_SERVICE_URL
+        value: http://fincore-account-service:8083
+      - key: PORT
+        value: "8084"
+
+  - type: web
+    name: fincore-notification-service
+    env: docker
+    dockerfilePath: notification-service/Dockerfile
+    envVars:
+      - key: SPRING_DATA_MONGODB_URI
+        sync: false
+      - key: SPRING_RABBITMQ_ADDRESSES
+        sync: false
+      - key: PORT
+        value: "8085"
+
+  - type: web
+    name: fincore-api-gateway
+    env: docker
+    dockerfilePath: api-gateway/Dockerfile
+    envVars:
+      - key: AUTH_SERVICE_URL
+        value: http://fincore-auth-service:8081
+      - key: USER_SERVICE_URL
+        value: http://fincore-user-service:8082
+      - key: ACCOUNT_SERVICE_URL
+        value: http://fincore-account-service:8083
+      - key: TRANSACTION_SERVICE_URL
+        value: http://fincore-transaction-service:8084
+      - key: NOTIFICATION_SERVICE_URL
+        value: http://fincore-notification-service:8085
+      - key: JWT_SECRET
+        sync: false
+      - key: PORT
+        value: "8080"
