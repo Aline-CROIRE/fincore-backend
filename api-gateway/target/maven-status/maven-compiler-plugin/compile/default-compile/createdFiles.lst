@@ -1,0 +1,4 @@
+com\fincore\gateway\ApiGatewayApplication.class
+com\fincore\gateway\filter\JwtAuthenticationFilter.class
+com\fincore\gateway\config\CorsConfig.class
+com\fincore\gateway\util\JwtUtils.class
