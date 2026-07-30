@@ -1,7 +1,7 @@
-FROM eclipse-temurin:21-jdk-alpine as builder
+FROM maven:3.9.6-eclipse-temurin-21-alpine AS builder
 WORKDIR /app
 COPY . .
-RUN ./mvnw clean package -pl api-gateway -am -DskipTests || mvn clean package -pl api-gateway -am -DskipTests
+RUN mvn clean package -pl api-gateway -am -DskipTests
 
 FROM eclipse-temurin:21-jre-alpine
 WORKDIR /app
