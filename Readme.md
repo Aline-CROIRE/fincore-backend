@@ -1,118 +1,566 @@
+#  FinCore Backend
 
-
-#  FinCore Backend - Enterprise Digital Banking Platform
-
-### *Production-Grade Event-Driven Microservices Architecture built with Java 21, Spring Boot 3, MongoDB, and RabbitMQ*
-
-![Java 21](https://img.shields.io/badge/Java-21-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
-![Spring Boot 3](https://img.shields.io/badge/Spring_Boot-3.2-6DB33F?style=for-the-badge&logo=springboot&logoColor=white)
-![Spring Cloud](https://img.shields.io/badge/Spring_Cloud-2023.0-6DB33F?style=for-the-badge&logo=spring&logoColor=white)
-![MongoDB](https://img.shields.io/badge/MongoDB-Atlas-47A248?style=for-the-badge&logo=mongodb&logoColor=white)
-![RabbitMQ](https://img.shields.io/badge/RabbitMQ-3.12-FF6600?style=for-the-badge&logo=rabbitmq&logoColor=white)
-![Docker](https://img.shields.io/badge/Docker-Containerized-2496ED?style=for-the-badge&logo=docker&logoColor=white)
-
-</div>
+## Enterprise Digital Banking Platform
 
 ---
 
-##  Executive Summary
+#  Overview
 
-**FinCore** is an enterprise-grade digital banking microservices platform designed to mirror real-world core financial systems. It isolates business domains into independent microservices, each managing its own dedicated MongoDB database.
+**FinCore** is a production-grade digital banking backend platform built using a modern **event-driven microservices architecture**.
 
-The platform provides stateless **JWT authentication**, **Spring Cloud Gateway** request routing, synchronous **OpenFeign** balance verification, asynchronous **RabbitMQ** transaction notifications, and strict **Idempotency Key Protection** to eliminate duplicate charges.
+The system is designed to simulate the architecture of real-world financial platforms by separating banking domains into independent services with dedicated databases, secure communication patterns, and scalable infrastructure.
 
----
+FinCore provides:
 
-##  System Architecture & Microservices Matrix
+*  Stateless JWT authentication
+*  Multi-account banking operations
+*  Secure money transfers
+*  Transaction idempotency protection
+*  Ev Service-to-service communication using OpenFeign
+* OpenAPI / Swagger API documentation
+*  Containerized deployment using Docker
 
-                              [ React + TypeScript Client ]
-                                            |
-                                            v
-                                   [ API Gateway :8080 ]
-                                            |
-     +------------------+-------------------+------------------+-------------------+
-     |                  |                   |                  |                   |
-     v                  v                   v                  v                   v
-
-[ Auth Service ] [ User Service ] [ Account Service ] [ Trans. Service ] [
-Notification ] Port: 8081 Port: 8082 Port: 8083 Port: 8084 Port: 8085 | | | | ^
-v v v v | ((auth_db)) ((user_db)) ((account_db)) ((transaction_db)) | MongoDB
-MongoDB MongoDB MongoDB | | | +---> [ RabbitMQ ] -+ Port: 5672
-
-
-### Microservices Breakdown
-
-| Microservice | Port | Database | Primary Responsibility |
-| :--- | :--- | :--- | :--- |
-| **API Gateway** | `8080` | None | Single entry point, JWT verification, CORS, route filtering |
-| **Auth Service** | `8081` | `auth_db` | User registration, login, BCrypt hashing, JWT issuance |
-| **User Service** | `8082` | `user_db` | Customer profile management, phone numbers, national IDs |
-| **Account Service**| `8083` | `account_db` | Multi-account creation, balance operations, idempotency storage |
-| **Transaction Service** | `8084` | `transaction_db` | Money transfers, deposits, Feign checks, RabbitMQ publishing |
-| **Notification Service** | `8085` | `notification_db` | Asynchronous RabbitMQ alert consumer & user notification log |
+The platform follows enterprise banking principles including **database isolation, fault tolerance, scalability, and secure distributed communication**.
 
 ---
 
-##  Key Engineering Highlights
+#  System Architecture
 
-- **Database-per-Service Isolation**: Zero shared databases across services. Data consistency is maintained via REST OpenFeign calls and event messaging.
-- **Transaction Idempotency Protection**: Requests with `X-Idempotency-Key` headers store produced outputs in MongoDB `idempotency_keys` collections. Network retries return cached responses without executing double-charges.
-- **Asynchronous Event-Driven Bus**: Transaction Service dispatches `TransactionCompletedEvent` to RabbitMQ topic exchange `banking.exchange`, which is consumed by Notification Service.
-- **Stateless JWT Security**: API Gateway inspects `Authorization: Bearer <token>` headers, validates HMAC-SHA signatures, and attaches user claims (`X-User-Id`, `X-User-Role`) downstream.
-- **OpenAPI 3.0 / Swagger Documentation**: Every service exposes live interactive Swagger UI endpoints (`/swagger-ui.html`).
+```
+                 React + TypeScript Client
+                           |
+                           |
+                           v
+
+                 Spring Cloud Gateway
+                      Port: 8080
+
+                           |
+      ------------------------------------------------
+      |              |              |                |
+      v              v              v                v
+
+ Auth Service   User Service  Account Service  Transaction Service
+   :8081          :8082          :8083              :8084
+
+      |              |              |                |
+      v              v              v                v
+
+ auth_db       user_db       account_db      transaction_db
+
+
+                           |
+                           v
+
+                    RabbitMQ Event Bus
+                       Port: 5672
+
+                           |
+                           v
+
+              Notification Service
+                    :8085
+
+                    notification_db
+```
 
 ---
 
-##  Database Schemas (MongoDB)
+#  Microservices Architecture
 
-### 1. `auth_db.users`
+| Service              | Port | Database        | Responsibility                                                    |
+| -------------------- | ---- | --------------- | ----------------------------------------------------------------- |
+| API Gateway          | 8080 | None            | Central entry point, routing, JWT validation, CORS handling       |
+| Auth Service         | 8081 | auth_db         | Registration, authentication, password encryption, JWT generation |
+| User Service         | 8082 | user_db         | Customer profiles, identity information management                |
+| Account Service      | 8083 | account_db      | Account creation, balance management, account operations          |
+| Transaction Service  | 8084 | transaction_db  | Transfers, deposits, transaction processing                       |
+| Notification Service | 8085 | notification_db | Transaction events, alerts, notification history                  |
+
+---
+
+#  Core Features
+
+##  Authentication & Authorization
+
+FinCore implements secure authentication using:
+
+* JWT-based stateless security
+* BCrypt password hashing
+* Role-based authorization
+* Gateway-level token verification
+
+Authentication flow:
+
+```
+Client
+ |
+ | Login Request
+ |
+ v
+Auth Service
+ |
+ | Generate JWT
+ |
+ v
+API Gateway
+ |
+ | Validate Token
+ |
+ v
+Backend Services
+```
+
+---
+
+#  Banking Operations
+
+## Account Management
+
+Supported operations:
+
+* Create customer accounts
+* Manage multiple accounts per user
+* Track account balances
+* Support different account types
+
+Example:
+
 ```json
 {
-  "_id": "65d1f8a2e4b0a12345678901",
-  "userId": "USR-D5F2BADA",
-  "email": "customer@fincore.com",
-  "password": "$2a$10$e8N0Vz5C4QjW5pL6qK7v8e1r2t3y4u5i6o7p8a9b0c1d2e3f4g5h6",
-  "role": "ROLE_CUSTOMER",
-  "active": true
+ "accountNumber": "FC-100023",
+ "type": "SAVINGS",
+ "currency": "RWF",
+ "balance": 4605000,
+ "status": "ACTIVE"
 }
+```
 
-2. account_db.accounts
+---
 
+##  Transaction Processing
+
+FinCore supports:
+
+* Account-to-account transfers
+* Deposits
+* Transaction history
+* Transaction references
+* Status tracking
+
+Example:
+
+```json
 {
-  "_id": "65d1f8a2e4b0a12345678903",
-  "accountNumber": "FC-100023",
-  "userId": "USR-D5F2BADA",
-  "type": "SAVINGS",
-  "balance": 4605000.00,
-  "currency": "RWF",
-  "status": "ACTIVE"
+ "transactionReference": "TRX-8392928374",
+ "senderAccountNumber": "FC-100023",
+ "receiverAccountNumber": "FC-100024",
+ "amount": 50000,
+ "currency": "RWF",
+ "type": "TRANSFER",
+ "status": "SUCCESS"
 }
+```
 
-3. transaction_db.transactions
+---
 
+#  Transaction Idempotency Protection
+
+Financial systems must prevent duplicate transactions caused by:
+
+* Network retries
+* Client refreshes
+* Timeout recovery
+* Duplicate API calls
+
+FinCore implements idempotency using:
+
+```
+X-Idempotency-Key
+```
+
+Workflow:
+
+```
+Client Request
+      |
+      v
+Check Idempotency Collection
+      |
+      |
+ Exists?
+  /    \
+Yes     No
+ |       |
+Return   Process Transaction
+Cached       |
+Response     |
+             v
+       Save Result
+```
+
+Example:
+
+```
+POST /transactions
+
+Headers:
+
+X-Idempotency-Key:
+8f91d7a9-transfer-payment
+```
+
+The same request will always return the original response without creating duplicate charges.
+
+---
+
+#  Event Driven Architecture
+
+FinCore uses RabbitMQ for asynchronous communication.
+
+Transaction flow:
+
+```
+Transaction Service
+
+        |
+        |
+        v
+
+TransactionCompletedEvent
+
+        |
+        |
+        v
+
+RabbitMQ Exchange
+
+banking.exchange
+
+        |
+        |
+        v
+
+Notification Service
+```
+
+Example event:
+
+```json
 {
-  "_id": "65d1f8a2e4b0a12345678904",
-  "transactionReference": "TRX-8392928374",
-  "senderAccountNumber": "FC-100023",
-  "receiverAccountNumber": "FC-100024",
-  "amount": 50000.00,
-  "type": "TRANSFER",
-  "status": "SUCCESS",
-  "timestamp": "2026-03-30T10:15:00Z"
+ "eventType":"TransactionCompleted",
+ "transactionReference":"TRX-8392928374",
+ "amount":50000,
+ "status":"SUCCESS"
 }
+```
 
- Local Setup & Execution
+Benefits:
 
-1. Start Infrastructure Containers (MongoDB & RabbitMQ)
+* Loose coupling
+* Better scalability
+* Faster processing
+* Reliable event delivery
 
+---
+
+# 🔗 Service Communication
+
+## OpenFeign Integration
+
+Synchronous communication is handled through Spring Cloud OpenFeign.
+
+Example:
+
+```
+Transaction Service
+        |
+        |
+        v
+
+Account Service
+
+Verify Balance
+      |
+      |
+Approve Transaction
+```
+
+Used for:
+
+* Balance verification
+* Account validation
+* Customer information retrieval
+
+---
+
+#  Database Design
+
+FinCore follows the:
+
+## Database-per-Service Pattern
+
+Each microservice owns its database.
+
+Advantages:
+
+ Independent scaling
+ Improved security
+ Service isolation
+ Better maintainability
+
+---
+
+## Auth Database
+
+`auth_db.users`
+
+```json
+{
+ "_id":"65d1f8a2e4b0a12345678901",
+ "userId":"USR-D5F2BADA",
+ "email":"customer@fincore.com",
+ "password":"encrypted_password",
+ "role":"ROLE_CUSTOMER",
+ "active":true
+}
+```
+
+---
+
+## Account Database
+
+`account_db.accounts`
+
+```json
+{
+ "_id":"65d1f8a2e4b0a12345678903",
+ "accountNumber":"FC-100023",
+ "userId":"USR-D5F2BADA",
+ "type":"SAVINGS",
+ "balance":4605000,
+ "currency":"RWF",
+ "status":"ACTIVE"
+}
+```
+
+---
+
+## Transaction Database
+
+`transaction_db.transactions`
+
+```json
+{
+ "_id":"65d1f8a2e4b0a12345678904",
+ "transactionReference":"TRX-8392928374",
+ "amount":50000,
+ "type":"TRANSFER",
+ "status":"SUCCESS",
+ "timestamp":"2026-03-30T10:15:00Z"
+}
+```
+
+---
+
+#  Security Architecture
+
+FinCore applies multiple security layers:
+
+## API Gateway Security
+
+* JWT validation
+* Request filtering
+* CORS configuration
+* Secure routing
+
+## Service Security
+
+* Role-based access control
+* Protected endpoints
+* Secure internal communication
+
+## Data Security
+
+* BCrypt password encryption
+* Isolated databases
+* No shared credentials
+
+---
+
+#  API Documentation
+
+Every microservice provides interactive Swagger documentation.
+
+Available endpoints:
+
+```
+http://localhost:8081/swagger-ui.html
+
+http://localhost:8082/swagger-ui.html
+
+http://localhost:8083/swagger-ui.html
+
+http://localhost:8084/swagger-ui.html
+
+http://localhost:8085/swagger-ui.html
+```
+
+---
+
+#  Running FinCore Locally
+
+## Requirements
+
+Install:
+
+* Java 21+
+* Maven 3.9+
+* Docker Desktop
+* MongoDB
+* RabbitMQ
+
+---
+
+# Step 1: Start Infrastructure
+
+Run:
+
+```bash
 docker-compose up -d mongodb rabbitmq
+```
 
-2. Build All Microservices
+Check containers:
 
+```bash
+docker ps
+```
+
+---
+
+# Step 2: Build All Services
+
+```bash
 mvn clean install -DskipTests
+```
 
-3. Run Stack via Docker Compose
+---
 
+# Step 3: Start Complete Platform
+
+```bash
 docker-compose up -d
+```
 
-API Gateway will be active at http://localhost:8080.
+---
+
+# Step 4: Verify Services
+
+Gateway:
+
+```
+http://localhost:8080
+```
+
+Services:
+
+```
+Auth Service:
+http://localhost:8081
+
+User Service:
+http://localhost:8082
+
+Account Service:
+http://localhost:8083
+
+Transaction Service:
+http://localhost:8084
+
+Notification Service:
+http://localhost:8085
+```
+
+---
+
+#  Project Structure
+
+```
+fincore-backend
+
+├── api-gateway
+│
+├── auth-service
+│
+├── user-service
+│
+├── account-service
+│
+├── transaction-service
+│
+├── notification-service
+│
+├── docker-compose.yml
+│
+└── pom.xml
+```
+
+---
+
+#  Technology Stack
+
+## Backend
+
+* Java 21
+* Spring Boot 3
+* Spring Cloud
+* Spring Security
+* Spring Data MongoDB
+
+## Communication
+
+* REST APIs
+* OpenFeign
+* RabbitMQ
+
+## Database
+
+* MongoDB Atlas
+
+## DevOps
+
+* Docker
+* Docker Compose
+* Maven
+
+---
+
+#  Future Improvements
+
+Planned enterprise enhancements:
+
+* Kubernetes deployment
+* Distributed tracing with Zipkin
+* Centralized logging using ELK Stack
+* Redis caching
+* Payment gateway integration
+* Two-factor authentication
+* Fraud detection with Machine Learning
+* CI/CD pipeline automation
+
+---
+
+#  Author
+
+**FinCore Backend Engineering Team**
+
+Built with enterprise software engineering principles focusing on:
+
+* Scalability
+* Reliability
+* Security
+* Maintainability
+
+---
+
+⭐ If you find this project useful, consider giving it a star.
